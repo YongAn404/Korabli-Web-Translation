@@ -12,6 +12,9 @@
 // ==/UserScript==
 
 (function() {
+
+    // categories
+
     GM_xmlhttpRequest({
         url:"https://raw.githubusercontent.com/YongAn404/Korabli-Web-Translation/refs/heads/dev/i18n/zh-cn/news/content.json",
         method :"GET",
@@ -19,7 +22,7 @@
         onload:function(xhr){
             let json = JSON.parse(xhr.responseText);
             elmGetter.each('.news-card', document, reply => {
-                //处理标题
+                //处理标签
                 const NCTS = reply.querySelectorAll('.news-card_title');
                 for (const key in NCTS) {
                     const NCT = NCTS[key];
@@ -27,6 +30,14 @@
                     if(typeof item != "undefined"){
                         NCT.innerHTML = item["title"];
                     }
+                }
+            });
+
+            elmGetter.each('.main', document.querySelector('.news-detail__content'), reply => {
+                const placeholder = reply.querySelector('placeholder');
+                const item = json[placeholder.innerHTML];
+                if(typeof item != "undefined"){
+                    placeholder.innerHTML=item["title"];
                 }
             });
 
@@ -61,10 +72,29 @@
     });
 
 
-    elmGetter.each('#footer', document, reply => {
-        const FAT = reply.querySelector('.footer-about_text');
-        FAT.innerHTML = "《船舶世界》 游戏基于第三方的知识产权。第三方权利客体的所有权利属于其合法权利持有人。<br data-v-800c1bf7> © Lesta Games, 2022–2024"
+    GM_xmlhttpRequest({
+        url:"https://raw.githubusercontent.com/YongAn404/Korabli-Web-Translation/refs/heads/dev/i18n/zh-cn/footer.json",
+        method :"GET",
+        dataType: 'json',
+        onload:function(xhr){
+            let json = JSON.parse(xhr.responseText);
+            elmGetter.each('#footer', document, reply => {
+                const classData = json["class"]
+                for (const key in classData) {
+                    const classText = classData[key];
+                    const classHTML = reply.querySelector(`.${key}`);
+                    classHTML.innerHTML = classText
+                }
+
+                const as = reply.querySelectorAll('a');
+                for (const key in as) {
+                    const a = as[key];
+                    let text = json[a.innerHTML];
+                    if(typeof text != "undefined"){
+                        a.innerHTML = text;
+                    }
+                }
+            });
+        }
     });
-
-
 })();
